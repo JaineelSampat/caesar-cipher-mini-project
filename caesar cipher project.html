@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Caesar Cipher & Encryption Information</title>
+    <style>
+      /* Reset some default styling */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Body and layout styling */
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f4f9;
+        padding: 40px;
+        color: #333;
+        line-height: 1.7;
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+      }
+
+      label {
+        font-weight: bold;
+        color: #444;
+        font-size: 1.1rem;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 1.1rem;
+      }
+
+      button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 1.1rem;
+      }
+
+      button:hover {
+        background-color: #218838;
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 20px auto;
+      }
+
+      .result-box {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border: 1px solid #ddd;
+        margin-top: 20px;
+        border-radius: 5px;
+      }
+
+      .result-box h2 {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+      }
+
+      .result {
+        font-size: 1.2rem;
+        color: #333;
+      }
+
+      /* Styling for the encryption/decryption text section */
+      .info-section {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
+        margin: 40px auto;
+        opacity: 0;
+        transition: opacity 1.5s ease-in-out;
+        font-size: 1.1rem;
+      }
+
+      .fade-in {
+        opacity: 1 !important;
+      }
+
+      .info-section h2 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+      }
+
+      .info-section p,
+      .info-section li {
+        font-size: 1.2rem;
+        color: #555;
+        line-height: 1.8;
+        margin-bottom: 10px;
+      }
+
+      .info-section ul {
+        margin-left: 20px;
+        list-style: disc;
+      }
+
+      .info-section ul li {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Caesar Cipher</h1>
+      <label for="operation">Select Operation:</label>
+      <select id="operation">
+        <option value="encrypt">Encrypt</option>
+        <option value="decrypt">Decrypt</option>
+      </select>
+
+      <label for="key">Enter Key (1-26):</label>
+      <input type="number" id="key" min="1" max="26" value="3" required />
+
+      <label for="text">Enter Text:</label>
+      <textarea id="text" rows="4" required></textarea>
+
+      <button onclick="performOperation()">Submit</button>
+
+      <div class="result-box">
+        <h2>Result:</h2>
+        <p class="result" id="result"></p>
+      </div>
+    </div>
+
+    <div class="info-section" id="infoSection">
+      <h2>Encryption and Decryption Explained</h2>
+      <p>
+        Encryption is the process of converting a readable message into an
+        unreadable format to protect it from unauthorized access. Decryption is
+        the reverse process, transforming the encrypted message back into its
+        original, readable form. The original message is referred to as
+        plaintext, while the encoded message is called ciphertext.
+      </p>
+      <p>
+        Decryption involves restoring encrypted data back to its original,
+        unencrypted state.
+      </p>
+      <p>
+        When encrypting plaintext or passwords, the approach you take should
+        depend on the security level required and the specific application.
+        Below are some key best practices:
+      </p>
+      <ul>
+        <li>
+          Use proven algorithms like AES for symmetric encryption and RSA or ECC
+          for asymmetric encryption.
+        </li>
+        <li>
+          Utilize strong keys, such as AES-256, and ensure keys are generated
+          securely.
+        </li>
+        <li>
+          Use cryptographic hash functions like bcrypt, Argon2, or PBKDF2 for
+          password storage.
+        </li>
+        <li>
+          Ensure secure key management and never hardcode keys in source code.
+        </li>
+        <li>Use TLS to encrypt data during transmission.</li>
+        <li>Implement encryption securely to avoid vulnerabilities.</li>
+        <li>
+          Regularly update encryption libraries and conduct audits for
+          vulnerabilities.
+        </li>
+        <li>
+          Ensure compliance with industry-specific regulations like GDPR or
+          HIPAA.
+        </li>
+        <li>
+          Use encryption as part of a broader security strategy, including
+          access controls and secure coding.
+        </li>
+      </ul>
+      <p>
+        By following these best practices, you can protect sensitive data from
+        unauthorized access.
+      </p>
+    </div>
+
+    <script>
+      // JavaScript Caesar Cipher implementation
+      const letters = "abcdefghijklmnopqrstuvwxyz";
+      const numLetters = letters.length;
+
+      function encrypt(plainText, key) {
+        let cipherText = "";
+        plainText = plainText.toLowerCase();
+
+        for (let i = 0; i < plainText.length; i++) {
+          let letter = plainText[i];
+          let index = letters.indexOf(letter);
+
+          if (index === -1) {
+            cipherText += letter; // Add non-letter characters as-is
+          } else {
+            let newIndex = index + key;
+            if (newIndex >= numLetters) {
+              newIndex -= numLetters; // Wrap around if necessary
+            }
+            cipherText += letters[newIndex];
+          }
+        }
+
+        return cipherText;
+      }
+
+      function decrypt(cipherText, key) {
+        let plainText = "";
+        cipherText = cipherText.toLowerCase();
+
+        for (let i = 0; i < cipherText.length; i++) {
+          let letter = cipherText[i];
+          let index = letters.indexOf(letter);
+
+          if (index === -1) {
+            plainText += letter; // Add non-letter characters as-is
+          } else {
+            let newIndex = index - key;
+            if (newIndex < 0) {
+              newIndex += numLetters; // Wrap around if necessary
+            }
+            plainText += letters[newIndex];
+          }
+        }
+
+        return plainText;
+      }
+
+      function performOperation() {
+        const operation = document.getElementById("operation").value;
+        const key = parseInt(document.getElementById("key").value);
+        const text = document.getElementById("text").value;
+
+        let result = "";
+
+        if (operation === "encrypt") {
+          result = encrypt(text, key);
+        } else if (operation === "decrypt") {
+          result = decrypt(text, key);
+        }
+
+        document.getElementById("result").textContent = result;
+      }
+
+      // JavaScript to handle fade-in effect on scroll
+      window.addEventListener("scroll", function () {
+        const infoSection = document.getElementById("infoSection");
+        const sectionPosition = infoSection.getBoundingClientRect().top;
+        const screenPosition = window.innerHeight / 1.2;
+
+        if (sectionPosition < screenPosition) {
+          infoSection.classList.add("fade-in");
+        }
+      });
+    </script>
+  </body>
+</html>
